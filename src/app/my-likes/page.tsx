@@ -150,6 +150,8 @@ export default function MyLikesPage() {
           currentIndex={selectedIndex}
           onClose={() => setSelectedIndex(null)}
           onIndexChange={setSelectedIndex}
+          savedCaptionIds={[]}
+          onSave={() => {}}
           wrapNavigation
         />
       )}
