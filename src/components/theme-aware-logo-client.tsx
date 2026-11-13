@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
+//import { usePathname } from "next/navigation";
+//import { cn } from "@/lib/utils";
 import { BrandImage } from "@/components/brand-image";
 
 const brandName = process.env.NEXT_PUBLIC_BRAND_NAME || "Crackd.ai";
@@ -15,8 +15,8 @@ interface ThemeAwareLogoClientProps {
 export function ThemeAwareLogoClient({ isAuthenticated }: ThemeAwareLogoClientProps) {
   const [mounted, setMounted] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const pathname = usePathname();
-  const isNewActive = pathname === "/new";
+  // const pathname = usePathname();
+  // const isNewActive = pathname === "/new";
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 640);
@@ -54,18 +54,6 @@ export function ThemeAwareLogoClient({ isAuthenticated }: ThemeAwareLogoClientPr
           />
         </Link>
       </div>
-      {/* "New" - Primary action, grouped with logo */}
-      {isAuthenticated && (
-        <Link
-          href="/new"
-          className={cn(
-            "hidden sm:block text-base font-medium transition-colors hover:text-primary",
-            isNewActive ? "text-primary" : "text-muted-foreground"
-          )}
-        >
-          New
-        </Link>
-      )}
     </div>
   );
 }
