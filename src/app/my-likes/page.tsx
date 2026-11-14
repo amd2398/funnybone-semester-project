@@ -7,6 +7,10 @@ import { BrandImage } from '@/components/brand-image'
 import { CaptionModal } from '@/components/ui/caption-modal'
 import { checkAuthStatusAction } from '@/app/actions/auth/check-auth-status'
 import { fetchLikedCaptionsAction } from '@/app/actions/captions/fetch-liked-captions-action'
+import {
+  fetchHumorPreferencesAction,
+  type HumorPreference,
+} from '@/app/actions/captions/fetch-humor-preferences-action'
 
 type LikedCaption = {
   id: string
@@ -17,6 +21,7 @@ type LikedCaption = {
 
 export default function MyLikesPage() {
   const [captions, setCaptions] = useState<LikedCaption[]>([])
+  const [preferences, setPreferences] = useState<HumorPreference[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
@@ -35,14 +40,21 @@ export default function MyLikesPage() {
           return
         }
 
-        const results = await fetchLikedCaptionsAction()
+        // Fetch liked captions and humor preferences.
+        const [results, humorResults] = await Promise.all([
+          fetchLikedCaptionsAction(),
+          fetchHumorPreferencesAction(),
+        ])
 
         if (active) {
           setCaptions(results)
+          setPreferences(humorResults)
         }
       } catch (err) {
         console.error('Failed to load likes:', err)
-        if (active) setError('Could not load your liked captions.')
+        if (active) {
+          setError('Could not load your liked captions or humor preferences.')
+        }
       } finally {
         if (active) setLoading(false)
       }
@@ -77,6 +89,50 @@ export default function MyLikesPage() {
           </div>
         )}
       </div>
+
+      {/* Humor Preference Analysis */}
+      {!loading && !error && preferences.length > 0 && (
+        <div className="w-full max-w-7xl mx-auto px-4">
+          <div className="rounded-lg border border-primary/20 bg-background/30 p-5 space-y-5">
+            <div>
+              <h2 className="text-xl font-semibold text-primary">Your Top Humor Preferences</h2>
+              <p className="text-sm text-muted-foreground mt-1">
+                Discover which humor styles you enjoy most based on your upvoted captions.
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              {preferences.map((preference, index) => (
+                <div key={preference.style} className="space-y-2">
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-muted-foreground">#{index + 1}</span>
+                      <span className="text-sm font-medium capitalize">{preference.style}</span>
+                    </div>
+
+                    <span className="text-sm text-muted-foreground">
+                      {preference.count} likes ({preference.percentage}%)
+                    </span>
+                  </div>
+
+                  <div className="w-full bg-primary/10 rounded-full h-3 overflow-hidden">
+                    <div
+                      className="bg-primary h-3 rounded-full transition-all duration-500"
+                      style={{
+                        width: `${preference.percentage}%`,
+                      }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <p className="text-xs text-muted-foreground">
+              Preferences are calculated from your currently liked captions.
+            </p>
+          </div>
+        </div>
+      )}
 
       {loading ? (
         <p className="text-center text-muted-foreground">Loading your likes...</p>
