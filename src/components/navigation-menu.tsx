@@ -9,11 +9,12 @@ export default function NavigationMenu() {
 
   // Content browsing items (public discovery + personal collection)
   const navItems = [
-    { label: "Top 100", href: "/" },
-    { label: "Favorites", href: "/favorites" },
-    { label: "My Likes", href: "/my-likes" },
-    { label: "Images", href: "/my-images" },
-  ];
+    { label: 'Top 100', href: '/' },
+    { label: 'Favorites', href: '/favorites' },
+    { label: 'My Likes', href: '/my-likes' },
+    { label: 'For You', href: '/for-you' },
+    { label: 'Images', href: '/my-images' },
+  ]
 
   return (
     <nav className="hidden sm:flex items-center space-x-2 lg:space-x-4 mx-6">
