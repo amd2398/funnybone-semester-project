@@ -81,13 +81,18 @@ export async function fetchRecommendedCaptionsAction(limit = 50) {
     throw new Error('Failed to fetch recommended captions')
   }
 
-  // 5. Exclude previously voted captions and rank the rest.
+  // 5. Normalize the Supabase image relationship,
+  // exclude previously voted captions, and calculate scores.
   const recommendations = (captions ?? [])
+    .map((caption) => ({
+      ...caption,
+      image: Array.isArray(caption.images) ? caption.images[0] : caption.images,
+    }))
     .filter(
       (caption) =>
         !votedCaptionIds.has(caption.id) &&
         Boolean(caption.content?.trim()) &&
-        Boolean(caption.images?.url)
+        Boolean(caption.image?.url)
     )
     .map((caption) => {
       const humorStyle = classifyHumor(caption.content ?? '')
@@ -98,9 +103,9 @@ export async function fetchRecommendedCaptionsAction(limit = 50) {
         id: caption.id,
         content: caption.content ?? '',
         image_id: caption.image_id ?? '',
-        image_url: caption.images?.url ?? '',
+        image_url: caption.image?.url ?? '',
         like_count: caption.like_count ?? 0,
-        is_common_use: caption.images?.is_common_use ?? false,
+        is_common_use: caption.image?.is_common_use ?? false,
         created_at: caption.created_datetime_utc,
         humor_style: humorStyle,
         recommendation_score: preferenceScore,
